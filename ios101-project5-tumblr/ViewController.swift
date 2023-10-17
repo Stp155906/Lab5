@@ -6,16 +6,54 @@
 import UIKit
 import Nuke
 
-class ViewController: UIViewController {
+class ViewController: UIViewController , UITableViewDataSource{
 
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    @IBOutlet weak var table: UITableView!
+    
+    /* Now, to display the post's summary in the cell's label and fetch the post's photo image URL, you'll need to do the following:
+     
+     Store the fetched posts in a property in your ViewController so you can reference them when populating your UITableView.
+     Implement the required UITableViewDataSource methods.
+     Set up the UITableViewCell to display the post's summary and load the image using the Nuke library.
+     Let's make these changes:
 
-        
-        fetchPosts()
-    }
+     Add a property for storing the fetched posts:*/
+    
+    
+    
+        //Create an array property to store the fetched blog posts in the view controller
 
+        var posts: [Post] = []
+
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            
+            //Assign the table view data source to be the view controller
+            table.dataSource = self
+            fetchPosts()
+
+        }
+
+        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+            return posts.count
+        }
+
+        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as! TableViewCell
+
+            let post = posts[indexPath.row]
+            
+            // this is where we labeled the cell box
+            cell.label.text = post.summary
+
+            if let photo = post.photos.first {
+                let url = photo.originalSize.url
+                Nuke.loadImage(with: url, into: cell.cellview)
+            }
+
+            return cell
+        }
 
 
     func fetchPosts() {
@@ -42,6 +80,8 @@ class ViewController: UIViewController {
                 DispatchQueue.main.async { [weak self] in
 
                     let posts = blog.response.posts
+                    self?.posts = posts
+                    self?.table.reloadData()
 
 
                     print("✅ We got \(posts.count) posts!")
