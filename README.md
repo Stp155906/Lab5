@@ -1,4 +1,4 @@
-# Lab5
+# Project 5
 # Project 5 - *Lab 5*
 
 Submitted by: **Shantalia Perez**
